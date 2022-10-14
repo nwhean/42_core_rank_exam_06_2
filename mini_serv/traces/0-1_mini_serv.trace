@@ -1,0 +1,246 @@
+= Host-specific information ====================================================
+$> hostname; uname -msr
+u80z03s07.42kl.edu.my
+Darwin 19.6.0 x86_64
+$> date
+Fri Oct 14 17:14:42 +08 2022
+$> gcc --version
+Configured with: --prefix=/Applications/Xcode.app/Contents/Developer/usr --with-gxx-include-dir=/Library/Developer/CommandLineTools/SDKs/MacOSX10.15.sdk/usr/include/c++/4.2.1
+Apple clang version 12.0.0 (clang-1200.0.32.28)
+Target: x86_64-apple-darwin19.6.0
+Thread model: posix
+InstalledDir: /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin
+$> clang --version
+Apple clang version 12.0.0 (clang-1200.0.32.28)
+Target: x86_64-apple-darwin19.6.0
+Thread model: posix
+InstalledDir: /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin
+
+= User files collection ========================================================
+Collecting user files from Vogsphere
+Repository URL: git@vogsphere.42kl.edu.my:exam-2022-10-14/weng_exam-rank-06_exam_07h56m33s.git
+
+= Git history ==================================================================
+$> git -C /tmp/tmpog2odb58/user log --pretty='%H - %an, %ad : %s'
+23e2482f64122f98d9d68afc23a8fbfe04441f81 - Exam 42, Fri Oct 14 17:10:21 2022 +0800 : Bug removal: files were not in mini_serv subdirectory
+9c8845c6893f03f5e02983cf4457a05c3067a6e2 - Exam 42, Fri Oct 14 17:02:31 2022 +0800 : Bug removal: extra empty message is sent upon client departure
+5342ef656b1cf19caa5827905a660d6137f8723b - Exam 42, Fri Oct 14 16:58:46 2022 +0800 : Added arrival and departure messages
+fe464c700ccdb08460b8749ed68e3af22bd72067 - Exam 42, Fri Oct 14 16:54:23 2022 +0800 : Added transmit function
+d1fc4aaf3c88a8b06ce5784c165be0724d46bbf3 - Exam 42, Fri Oct 14 16:43:40 2022 +0800 : Added receive, extract and broadcast functions
+ffdbf6fdafc448d314ccc938c961b95fd2e82a94 - Exam 42, Fri Oct 14 15:49:31 2022 +0800 : Added wait_events and manage_events functions
+3f7a9c3656c249bddbdad91e095a24861ee6d147 - Exam 42, Fri Oct 14 15:34:29 2022 +0800 : Added client management functions
+293e94099bb49c41b5328c56c15087d33cb107ba - Exam 42, Fri Oct 14 15:14:49 2022 +0800 : Added handle_connection function
+b598178c5dba35a905b3582ac9fd424ef9a30436 - Exam 42, Fri Oct 14 15:11:29 2022 +0800 : Added setup_listener function
+52eec980f826b7dd8de03163986c9702aa7fdba0 - Exam 42, Fri Oct 14 15:00:47 2022 +0800 : Added string functions
+ea95a170acdae8057ba46bea4ca106939a57043a - Exam 42, Fri Oct 14 14:54:30 2022 +0800 : Copied main.c into mini_serv.c and corrected compilation errors
+939dcf581931c22edd1f526b375654c6f650f8bf - Exam 42, Fri Oct 14 14:48:08 2022 +0800 : Initial commit with .gitignore
+ 
+= Collected files ==========================================
+$> ls -lAR /tmp/tmpog2odb58/user
+total 16
+-rw-r--r--  1 root  wheel   125 Oct 14 17:14 .gitignore
+-rw-r--r--  1 root  wheel  3388 Oct 14 17:14 __GIT_HISTORY
+drwxr-xr-x  3 root  wheel    96 Oct 14 17:14 mini_serv
+
+/tmp/tmpog2odb58/user/mini_serv:
+total 24
+-rw-r--r--  1 root  wheel  8725 Oct 14 17:14 mini_serv.c
+ 
+= mini_serv ====================================================================
+
+================================================================================
+Generating test 1
+Cmd ----------------------------------------------------------------------------
+#EXE_NAME#
+--------------------------------------------------------------------------------
+Done
+================================================================================
+
+================================================================================
+Generating test 2
+Cmd ----------------------------------------------------------------------------
+#EXE_NAME# 22
+--------------------------------------------------------------------------------
+Done
+================================================================================
+
+================================================================================
+Generating test 3
+Cmd ----------------------------------------------------------------------------
+./tester #EXE_NAME# generated3.test 26174685 | sort
+----------------------------------------------------------------------
+----------
+Done
+================================================================================
+
+================================================================================
+Generating test 4
+Cmd ----------------------------------------------------------------------------
+./tester #EXE_NAME# generated4.test 5611160 | sort
+--------------------------------------------------------------------------------
+Done
+================================================================================
+
+================================================================================
+Generating test 5
+Cmd ----------------------------------------------------------------------------
+./tester #EXE_NAME# generated5.test 27536952 | sort
+--------------------------------------------------------------------------------
+Done
+================================================================================
+
+================================================================================
+Generating test 6
+Cmd ------------------------
+----------------------------------------------------
+./tester #EXE_NAME# generated6.test 28002338 | sort
+--------------------------------------------------------------------------------
+Done
+================================================================================
+
+================================================================================
+Generating test 7
+Cmd ----------------------------------------------------------------------------
+./tester #EXE_NAME# generated7.test 23250509 | sort
+--------------------------------------------------------------------------------
+Done
+================================================================================
+
+================================================================================
+Generating test 8
+Cmd ----------------------------------------------------------------------------
+./tester #EXE_NAME# generated8.test 4489216 | sort
+--------------------------------------------------------------------------------
+Done
+==================================
+==============================================
+
+================================================================================
+Generating test 9
+Cmd ----------------------------------------------------------------------------
+./tester #EXE_NAME# generated9.test 24096613 | sort
+--------------------------------------------------------------------------------
+Done
+================================================================================
+
+
+
+$> gcc -Wextra -Wall -Werror fcntl.c mini_serv.c -o user_exe 
+
+
+
+__OSSwapInt16
+___darwin_fd_isset
+_broadcast
+_client_add
+_client_clear
+_client_new
+_client_remove
+_extract
+_extract_one
+_ft_error
+_ft_fatal
+_ft_memmove
+_ft_putstr_fd
+_ft_strchr
+_g_clients
+_g_id
+_get_max_fd
+_handle_connection
+_main
+_manage_events
+_receive
+_setup_listener
+_transmit
+_wait_events
+
+
+
+__sprintf_chk
+__stack_chk_fail
+__stack_chk_guard
+__strcat_chk
+accept
+atoi
+bind
+close
+exit
+free
+listen
+malloc
+memset
+realloc
+recv
+select$1050
+send
+socket
+strlen
+write
+
+
+$> gcc -Wextra -Wall -Werror fcntl.c main.c -o ref_exe 
+
+
+= Test 1 ===================================================
+total 32
+-rwxr-xr-x  1 deepthought  101  14716 Oct 14 09:15 bzjkx5aybpto0r4ghdrbnkoe
+
+
+$> ./bzjkx5aybpto0r4ghdrbnkoe
+Wrong number of arguments
+
+
+
+
+Command 'kill -9 -1 ' got killed by a SIGKILL (Signal -9)
+total 32
+-rwxr-xr-x  1 deepthought  101  14516 Oct 14 09:15 bzjkx5aybpto0r4ghdrbnkoe
+
+
+$> ./bzjkx5aybpto0r4ghdrbnkoe
+Wrong number of arguments
+
+
+$> diff -U 3 user_output_test1 test1.output | cat -e
+
+
+Diff OK :D
+= Test 2 ===================================================
+total 32
+-rwxr-xr-x  1 deepthought  101  14716 Oct 14 09:15 7ueny4548e81cmj5qdzih7yo
+
+
+$> ./7ueny4548e81cmj5qdzih7yo 22
+Socket successfully created..
+Fatal error
+
+
+
+
+Command 'kill -9 -1 ' got killed by a SIGKILL (Signal -9)
+total 32
+-rwxr-xr-x  1 deepthought  101  14516 Oct 14 09:15 7ueny4548e81cmj5qdzih7yo
+
+
+$> ./7ueny4548e81cmj5qdzih7yo 22
+Fatal error
+
+
+$> diff -U 3 user_output_test2 test2.output | cat -e
+--- user_output_test2	2022-10-14 09:15:01.000000000 +0000$
++++ test2.output	2022-10-14 09:15:01.000000000 +0000$
+@@ -1,2 +1 @@$
+-Socket successfully created..$
+ Fatal error$
+
+
+--- user_output_test2	2022-10-14 09:15:01.000000000 +0000$
++++ test2.output	2022-10-14 09:15:01.000000000 +0000$
+@@ -1,2 +1 @@$
+-Socket successfully created..$
+ Fatal error$
+
+Diff KO :(
+Grade: 0
+
+= Final grade: 0 ===============================================================
