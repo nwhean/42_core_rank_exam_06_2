@@ -12,6 +12,8 @@ void	ft_putstr_fd(const char *s, int fd);
 void	ft_error(const char *s);
 void	ft_fatal(void);
 
+int		setup_listener(int port);
+
 /* print string s to file descriptor fd. */
 void	ft_putstr_fd(const char *s, int fd)
 {
@@ -31,10 +33,10 @@ void	ft_fatal(void)
 	ft_error("Fatal error\n");
 }
 
-int extract_message(char **buf, char **msg)
+int	extract_message(char **buf, char **msg)
 {
 	char	*newbuf;
-	int	i;
+	int		i;
 
 	*msg = 0;
 	if (*buf == 0)
@@ -58,7 +60,7 @@ int extract_message(char **buf, char **msg)
 	return (0);
 }
 
-char *str_join(char *buf, char *add)
+char	*str_join(char *buf, char *add)
 {
 	char	*newbuf;
 	int		len;
@@ -78,44 +80,43 @@ char *str_join(char *buf, char *add)
 	return (newbuf);
 }
 
+/* Setup and return the listener fd. */
+int	setup_listener(int port)
+{
+	int					sockfd;
+	struct sockaddr_in	servaddr;
 
-int main() {
-	int sockfd, connfd;
-	socklen_t len;
-	struct sockaddr_in servaddr, cli; 
+	sockfd = socket(AF_INET, SOCK_STREAM, 0);
+	if (sockfd == -1)
+		ft_fatal();
+	ft_putstr_fd("Socket successfully created..\n", 1);
+	bzero(&servaddr, sizeof(servaddr));
+	servaddr.sin_family = AF_INET;
+	servaddr.sin_addr.s_addr = htonl(2130706433);
+	servaddr.sin_port = htons(port);
+	if ((bind(sockfd, (const struct sockaddr *)&servaddr, sizeof(servaddr)))
+		!= 0)
+		ft_fatal();
+	ft_putstr_fd("Socket successfully binded..\n", 1);
+	if (listen(sockfd, 10) != 0)
+		ft_fatal();
+	return (sockfd);
+}
 
-	// socket create and verification 
-	sockfd = socket(AF_INET, SOCK_STREAM, 0); 
-	if (sockfd == -1) { 
-		ft_putstr_fd("socket creation failed...\n", 1); 
-		exit(0); 
-	} 
-	else
-		ft_putstr_fd("Socket successfully created..\n", 1); 
-	bzero(&servaddr, sizeof(servaddr)); 
+int	main(int argc, char **argv)
+{
+	int					listener;
+	int					connfd;
+	socklen_t			len;
+	struct sockaddr_in	cli;
 
-	// assign IP, PORT 
-	servaddr.sin_family = AF_INET; 
-	servaddr.sin_addr.s_addr = htonl(2130706433); //127.0.0.1
-	servaddr.sin_port = htons(8081); 
-  
-	// Binding newly created socket to given IP and verification 
-	if ((bind(sockfd, (const struct sockaddr *)&servaddr, sizeof(servaddr))) != 0) { 
-		ft_putstr_fd("socket bind failed...\n", 1); 
-		exit(0); 
-	} 
-	else
-		ft_putstr_fd("Socket successfully binded..\n", 1);
-	if (listen(sockfd, 10) != 0) {
-		ft_putstr_fd("cannot listen\n", 1); 
-		exit(0); 
-	}
+	if (argc != 2)
+		ft_error("Wrong number of arguments\n");
+	listener = setup_listener(atoi(argv[1]));
 	len = sizeof(cli);
-	connfd = accept(sockfd, (struct sockaddr *)&cli, &len);
-	if (connfd < 0) { 
-        ft_putstr_fd("server acccept failed...\n", 1); 
-        exit(0); 
-    } 
-    else
-        ft_putstr_fd("server acccept the client...\n", 1);
+	connfd = accept(listener, (struct sockaddr *)&cli, &len);
+	if (connfd < 0)
+		ft_fatal();
+	else
+		ft_putstr_fd("server acccept the client...\n", 1);
 }
