@@ -254,8 +254,8 @@ void	broadcast(int source, const char *str)
 		sprintf(str_source, "server: ");
 	else
 		sprintf(str_source, "client %d: ", source);
-	ft_putstr_fd(str_source, 1);
-	ft_putstr_fd(str, 1);
+	//ft_putstr_fd(str_source, 1);
+	//ft_putstr_fd(str, 1);
 	len = strlen(str_source) + strlen(str);
 	this = g_clients;
 	while (this != NULL)
@@ -310,7 +310,7 @@ int	setup_listener(int port)
 	sockfd = socket(AF_INET, SOCK_STREAM, 0);
 	if (sockfd == -1)
 		ft_fatal();
-	ft_putstr_fd("Socket successfully created..\n", 1);
+	//ft_putstr_fd("Socket successfully created..\n", 1);
 	bzero(&servaddr, sizeof(servaddr));
 	servaddr.sin_family = AF_INET;
 	servaddr.sin_addr.s_addr = htonl(2130706433);
@@ -318,7 +318,7 @@ int	setup_listener(int port)
 	if ((bind(sockfd, (const struct sockaddr *)&servaddr, sizeof(servaddr)))
 		!= 0)
 		ft_fatal();
-	ft_putstr_fd("Socket successfully binded..\n", 1);
+	//ft_putstr_fd("Socket successfully binded..\n", 1);
 	if (listen(sockfd, 10) != 0)
 		ft_fatal();
 	return (sockfd);
@@ -336,8 +336,8 @@ void	handle_connection(int listener)
 	connfd = accept(listener, (struct sockaddr *)&cli, &len);
 	if (connfd < 0)
 		ft_fatal();
-	else
-		ft_putstr_fd("server acccept the client...\n", 1);
+	//else
+	//	ft_putstr_fd("server acccept the client...\n", 1);
 	new = client_new(connfd);
 	client_add(new);
 }
