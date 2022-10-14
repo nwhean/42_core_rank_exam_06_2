@@ -1,5 +1,6 @@
 # temporary file
 *.swp
+*.dSYM
 
 # Makefile
 Makefile
