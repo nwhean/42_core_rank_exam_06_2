@@ -1,0 +1,13 @@
+# temporary file
+*.swp
+
+# Makefile
+Makefile
+
+# subject file and main.c
+subject.en.txt
+main.c
+
+# executable
+mini_serv
+
