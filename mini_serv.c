@@ -123,8 +123,11 @@ t_client	*client_new(int fd)
 /* Add a new client to the g_clients linked list */
 void	client_add(t_client *new)
 {
+	char		str[100];
 	t_client	*this;
 
+	sprintf(str, "client %d just arrived\n", new->id);
+	broadcast(-1, str);
 	if (g_clients == NULL)
 		g_clients = new;
 	else
@@ -139,6 +142,7 @@ void	client_add(t_client *new)
 /* Remove client from g_clients linked list */
 void	client_remove(t_client **client)
 {
+	char		str[100];
 	t_client	*this;
 
 	if (g_clients == *client)
@@ -150,6 +154,8 @@ void	client_remove(t_client **client)
 			this = this->next;
 		this->next = (*client)->next;
 	}
+	sprintf(str, "client %d just left\n", (*client)->id);
+	broadcast(-1, str);
 	close((*client)->fd);
 	free((*client)->buf_in);
 	free((*client)->buf_out);
