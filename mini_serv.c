@@ -30,11 +30,18 @@ int			g_id = 0;
 void		ft_putstr_fd(const char *s, int fd);
 void		ft_error(const char *s);
 void		ft_fatal(void);
+void		*ft_memmove(void *dst, const void *src, size_t len);
+char		*ft_strchr(const char *s, int c);
 
 t_client	*client_new(int fd);
 void		client_add(t_client *new);
 void		client_remove(t_client **client);
 void		client_clear(void);
+
+int			receive(t_client *client);
+int			extract(t_client *client, int is_open);
+size_t		extract_one(int id, const char *buf, char delimiter);
+void		broadcast(int source, const char *str);
 
 int			setup_listener(int port);
 void		handle_connection(int listener);
@@ -61,52 +68,32 @@ void	ft_fatal(void)
 	ft_error("Fatal error\n");
 }
 
-int	extract_message(char **buf, char **msg)
+/* Copies len byets from string src to string dst. */
+void	*ft_memmove(void *dst, const void *src, size_t len)
 {
-	char	*newbuf;
-	int		i;
+	char		*d;
+	const char	*s;
 
-	*msg = 0;
-	if (*buf == 0)
-		return (0);
-	i = 0;
-	while ((*buf)[i])
-	{
-		if ((*buf)[i] == '\n')
-		{
-			newbuf = calloc(1, sizeof(*newbuf) * (strlen(*buf + i + 1) + 1));
-			if (newbuf == 0)
-				return (-1);
-			strcpy(newbuf, *buf + i + 1);
-			*msg = *buf;
-			(*msg)[i + 1] = 0;
-			*buf = newbuf;
-			return (1);
-		}
-		i++;
-	}
-	return (0);
+	d = dst + len;
+	s = src + len;
+	while (len-- > 0)
+		*--d = *--s;
+	return (dst);
 }
 
-char	*str_join(char *buf, char *add)
+/* Locate first ocurrence of 'c' in string 's' */
+char	*ft_strchr(const char *s, int c)
 {
-	char	*newbuf;
-	int		len;
+	char ch;
 
-	if (buf == 0)
-		len = 0;
+	ch = (char) c;
+	while (*s != ch && *s != '\0')
+		++s;
+	if (*s == ch)
+		return ((char *)s);
 	else
-		len = strlen(buf);
-	newbuf = malloc(sizeof(*newbuf) * (len + strlen(add) + 1));
-	if (newbuf == 0)
-		return (0);
-	newbuf[0] = 0;
-	if (buf != 0)
-		strcat(newbuf, buf);
-	free(buf);
-	strcat(newbuf, add);
-	return (newbuf);
-}
+		return (NULL);
+}	
 
 /* Allocated memory for a new t_client struct */
 t_client	*client_new(int fd)
@@ -178,6 +165,106 @@ void	client_clear(void)
 	{
 		this = g_clients;
 		client_remove(&this);
+	}
+}
+
+/* Call recv to store message into buf_in. */
+int	receive(t_client *client)
+{
+	ssize_t	byte;
+
+	byte = recv(client->fd, client->buf_in + client->off_in,
+			client->cap_in - client->off_in - 1, 0);
+	if (byte <= 0)
+		return (0);
+	client->off_in += byte;
+	client->buf_in[client->off_in] = '\0';
+	if (client->off_in == client->cap_in - 1)
+	{
+		client->cap_in *= 2;
+		client->buf_in = realloc(client->buf_in, client->cap_in);
+		if (client->buf_in == NULL)
+			ft_fatal();
+	}
+	return (1);
+}
+
+/* Extract messages from buf_in and broadcast to other clients */
+int	extract(t_client *client, int is_open)
+{
+	size_t	processed;
+	size_t	len;
+
+	processed = 0;
+	len = 1;
+	while (len != 0)
+	{
+		len = extract_one(client->id, client->buf_in + processed, '\n');
+		processed += len;
+	}
+	if (!is_open)
+	{
+		len = extract_one(client->id, client->buf_in + processed, '\0');
+		processed += len;
+	}
+	client->off_in -= processed;
+	ft_memmove(client->buf_in, client->buf_in + processed,
+		client->off_in + 1);
+	return (is_open);
+}
+
+/* Extract one message from buffer and broadcast to other clients */
+size_t	extract_one(int id, const char *buf, char delimiter)
+{
+	char	*str;
+	char	*end;
+	size_t	len;
+
+	end = ft_strchr(buf, delimiter);
+	if (end == NULL)
+		return (0);
+	len = end - buf + (delimiter != '\0');
+	str = malloc(sizeof(char) * (len + 1));
+	if (str == NULL)
+		ft_fatal();
+	ft_memmove(str, buf, len);
+	str[len] = '\0';
+	broadcast(id, str);
+	free(str);
+	return (len);
+}
+
+/* Add str into buf_out of other clients */
+void	broadcast(int source, const char *str)
+{
+	char		str_source[100];
+	size_t		len;
+	t_client	*this;
+
+	if (source < 0)
+		sprintf(str_source, "server: ");
+	else
+		sprintf(str_source, "client %d: ", source);
+	ft_putstr_fd(str_source, 1);
+	ft_putstr_fd(str, 1);
+	len = strlen(str_source) + strlen(str);
+	this = g_clients;
+	while (this != NULL)
+	{
+		if (this->id != source)
+		{
+			this->off_out += len;
+			while (this->off_out + 1 > this->cap_out)
+			{
+				this->cap_out *= 2;
+				this->buf_out = realloc(this->buf_out, this->cap_out);
+				if (this->buf_out == NULL)
+					ft_fatal();
+			}
+			strcat(this->buf_out, str_source);
+			strcat(this->buf_out, str);
+		}
+		this = this->next;
 	}
 }
 
@@ -272,9 +359,8 @@ void	manage_events(fd_set *rfds, fd_set *wfds, int listener)
 		next = this->next;
 		if (FD_ISSET(this->fd, rfds))
 		{
-			// receive
-			// extract
-			// broadcast
+			if (!extract(this, receive(this)))
+				client_remove(&this);
 		}
 		if (FD_ISSET(this->fd, wfds))
 		{
