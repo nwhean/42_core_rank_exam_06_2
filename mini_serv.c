@@ -13,6 +13,7 @@ void	ft_error(const char *s);
 void	ft_fatal(void);
 
 int		setup_listener(int port);
+void	handle_connection(int listener);
 
 /* print string s to file descriptor fd. */
 void	ft_putstr_fd(const char *s, int fd)
@@ -103,20 +104,27 @@ int	setup_listener(int port)
 	return (sockfd);
 }
 
-int	main(int argc, char **argv)
+/* Handle a new connection from the listener fd */
+void	handle_connection(int listener)
 {
-	int					listener;
 	int					connfd;
 	socklen_t			len;
 	struct sockaddr_in	cli;
 
-	if (argc != 2)
-		ft_error("Wrong number of arguments\n");
-	listener = setup_listener(atoi(argv[1]));
 	len = sizeof(cli);
 	connfd = accept(listener, (struct sockaddr *)&cli, &len);
 	if (connfd < 0)
 		ft_fatal();
 	else
 		ft_putstr_fd("server acccept the client...\n", 1);
+}
+
+int	main(int argc, char **argv)
+{
+	int					listener;
+
+	if (argc != 2)
+		ft_error("Wrong number of arguments\n");
+	listener = setup_listener(atoi(argv[1]));
+	handle_connection(listener);
 }
