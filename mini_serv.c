@@ -4,8 +4,32 @@
 #include <netdb.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
+
+void	ft_putstr_fd(const char *s, int fd);
+void	ft_error(const char *s);
+void	ft_fatal(void);
+
+/* print string s to file descriptor fd. */
+void	ft_putstr_fd(const char *s, int fd)
+{
+	write(fd, s, strlen(s));
+}
+
+/* print error message s to stderr and exit */
+void	ft_error(const char *s)
+{
+	ft_putstr_fd(s, 2);
+	exit(1);
+}
+
+/* print "Fatal error\n" to stderr and exit */
+void	ft_fatal(void)
+{
+	ft_error("Fatal error\n");
+}
 
 int extract_message(char **buf, char **msg)
 {
@@ -63,11 +87,11 @@ int main() {
 	// socket create and verification 
 	sockfd = socket(AF_INET, SOCK_STREAM, 0); 
 	if (sockfd == -1) { 
-		printf("socket creation failed...\n"); 
+		ft_putstr_fd("socket creation failed...\n", 1); 
 		exit(0); 
 	} 
 	else
-		printf("Socket successfully created..\n"); 
+		ft_putstr_fd("Socket successfully created..\n", 1); 
 	bzero(&servaddr, sizeof(servaddr)); 
 
 	// assign IP, PORT 
@@ -77,21 +101,21 @@ int main() {
   
 	// Binding newly created socket to given IP and verification 
 	if ((bind(sockfd, (const struct sockaddr *)&servaddr, sizeof(servaddr))) != 0) { 
-		printf("socket bind failed...\n"); 
+		ft_putstr_fd("socket bind failed...\n", 1); 
 		exit(0); 
 	} 
 	else
-		printf("Socket successfully binded..\n");
+		ft_putstr_fd("Socket successfully binded..\n", 1);
 	if (listen(sockfd, 10) != 0) {
-		printf("cannot listen\n"); 
+		ft_putstr_fd("cannot listen\n", 1); 
 		exit(0); 
 	}
 	len = sizeof(cli);
 	connfd = accept(sockfd, (struct sockaddr *)&cli, &len);
 	if (connfd < 0) { 
-        printf("server acccept failed...\n"); 
+        ft_putstr_fd("server acccept failed...\n", 1); 
         exit(0); 
     } 
     else
-        printf("server acccept the client...\n");
+        ft_putstr_fd("server acccept the client...\n", 1);
 }
