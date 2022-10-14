@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/select.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
 
@@ -37,6 +38,9 @@ void		client_clear(void);
 
 int			setup_listener(int port);
 void		handle_connection(int listener);
+int			get_max_fd(int listener);
+void		wait_events(fd_set *rfds, fd_set *wfds, int listener);
+void		manage_events(fd_set *rfds, fd_set *wfds, int listener);
 
 /* print string s to file descriptor fd. */
 void	ft_putstr_fd(const char *s, int fd)
@@ -218,14 +222,82 @@ void	handle_connection(int listener)
 	client_add(new);
 }
 
+/* Return the maximum fd used in this program. */
+int	get_max_fd(int listener)
+{
+	int			retval;
+	t_client	*this;
+
+	retval = listener;
+	this = g_clients;
+	while (this != NULL)
+	{
+		if (this->fd > retval)
+			retval = this->fd;
+		this = this->next;
+	}
+	return (retval);
+}
+
+/* Call select to wait for events */
+void	wait_events(fd_set *rfds, fd_set *wfds, int listener)
+{
+	t_client	*this;
+
+	FD_ZERO(rfds);
+	FD_ZERO(wfds);
+	FD_SET(listener, rfds);
+	this = g_clients;
+	while (this != NULL)
+	{
+		FD_SET(this->fd, rfds);
+		if (this->off_out > 0)
+			FD_SET(this->fd, wfds);
+		this = this->next;
+	}
+	select(get_max_fd(listener) + 1, rfds, wfds, NULL, NULL);
+}
+
+/* Manage connection, read or write events */
+void	manage_events(fd_set *rfds, fd_set *wfds, int listener)
+{
+	t_client	*this;
+	t_client	*next;
+
+	if (FD_ISSET(listener, rfds))
+		handle_connection(listener);
+	this = g_clients;
+	while (this != NULL)
+	{
+		next = this->next;
+		if (FD_ISSET(this->fd, rfds))
+		{
+			// receive
+			// extract
+			// broadcast
+		}
+		if (FD_ISSET(this->fd, wfds))
+		{
+			// transmit
+		}
+		this = next;
+	}
+}
+
 int	main(int argc, char **argv)
 {
-	int					listener;
+	int		listener;
+	fd_set	rfds;
+	fd_set	wfds;
 
 	if (argc != 2)
 		ft_error("Wrong number of arguments\n");
 	listener = setup_listener(atoi(argv[1]));
-	handle_connection(listener);
+	while (1)
+	{
+		wait_events(&rfds, &wfds, listener);
+		manage_events(&rfds, &wfds, listener);
+	}
 	close(listener);
 	client_clear();
 	return (0);
