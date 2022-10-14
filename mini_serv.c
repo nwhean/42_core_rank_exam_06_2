@@ -231,6 +231,8 @@ size_t	extract_one(int id, const char *buf, char delimiter)
 	if (end == NULL)
 		return (0);
 	len = end - buf + (delimiter != '\0');
+	if (len == 0)
+		return (0);
 	str = malloc(sizeof(char) * (len + 1));
 	if (str == NULL)
 		ft_fatal();
@@ -292,7 +294,7 @@ int	transmit(t_client *client)
 	}
 	client->off_out -= processed;
 	ft_memmove(client->buf_out, client->buf_out + processed,
-			client->off_out + 1);
+		client->off_out + 1);
 	if (byte < 0)
 		return (0);
 	else
