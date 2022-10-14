@@ -42,6 +42,7 @@ int			receive(t_client *client);
 int			extract(t_client *client, int is_open);
 size_t		extract_one(int id, const char *buf, char delimiter);
 void		broadcast(int source, const char *str);
+int			transmit(t_client *client);
 
 int			setup_listener(int port);
 void		handle_connection(int listener);
@@ -268,6 +269,30 @@ void	broadcast(int source, const char *str)
 	}
 }
 
+/* Call send to transmit message to socket */
+int	transmit(t_client *client)
+{
+	ssize_t	byte;
+	size_t	processed;
+
+	processed = 0;
+	byte = 1;
+	while (client->off_out - processed > 0 && byte > 0)
+	{
+		byte = send(client->fd, client->buf_out + processed,
+				client->off_out - processed, 0);
+		if (byte > 0)
+			processed += byte;
+	}
+	client->off_out -= processed;
+	ft_memmove(client->buf_out, client->buf_out + processed,
+			client->off_out + 1);
+	if (byte < 0)
+		return (0);
+	else
+		return (1);
+}
+
 /* Setup and return the listener fd. */
 int	setup_listener(int port)
 {
@@ -362,9 +387,10 @@ void	manage_events(fd_set *rfds, fd_set *wfds, int listener)
 			if (!extract(this, receive(this)))
 				client_remove(&this);
 		}
-		if (FD_ISSET(this->fd, wfds))
+		if (this && FD_ISSET(this->fd, wfds))
 		{
-			// transmit
+			if (!transmit(this))
+				client_remove(&this);
 		}
 		this = next;
 	}
